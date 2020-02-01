@@ -28,7 +28,7 @@ var init = function()
             var b = data.color_data.levels[1];
             var c = data.color_data.levels[2];
         
-            console.log(a+"_"+b+"_"+c);
+           // console.log(a+"_"+b+"_"+c);
 
             document.body.style.backgroundColor = "rgb("+a+","+b+","+c+")";
             
@@ -54,7 +54,7 @@ function startmove(dir)
         }
     )
 
-    console.log("Start: ("+dirFromInt(dir).x+","+dirFromInt(dir).y+").");
+   // console.log("Start: ("+dirFromInt(dir).x+","+dirFromInt(dir).y+").");
 
 }
 
@@ -62,12 +62,14 @@ function endmove(dir)
 {
     airconsole.message(AirConsole.SCREEN,
         {
-            direction:dir,
+
+            type : "Movement",
+            direction: dir,
             vector: new Vector2(0,0)
         }
     )
 
-    console.log("End: ("+dirFromInt(dir).x+","+dirFromInt(dir).y+").");
+   // console.log("End: ("+dirFromInt(dir).x+","+dirFromInt(dir).y+").");
 }
 
 function dirFromInt(number){
@@ -75,6 +77,8 @@ function dirFromInt(number){
     if(number == 1) return new Vector2(0,-1);//down
     if(number == 2) return new Vector2(-1,0);//left
     if(number == 3) return new Vector2(1,0);//right
+
+    else return new Vector2(0,0);
 }
 
 

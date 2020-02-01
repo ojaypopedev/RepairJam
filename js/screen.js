@@ -9,18 +9,19 @@ class Vector2{
 }
 class player{
 
-    constructor(device_id,position,velocity,color)
+    constructor(device_id,position,color)
     {
         this.device_id = device_id;
         this.position = position;
-        this.velocity = velocity;
+        this.velocity = new Vector2(0,0);
         this.color = color;
+        this.movements = [];
     }
 
     move()
     {
-        this.position.x += this.velocity.x;
-        this.position.y += this.velocity.y;
+        this.position.x += this.velocity.x*speed;
+        this.position.y += this.velocity.y*speed;
     }
 
 }
@@ -32,6 +33,22 @@ class pulse{
         this.bigSize = bigSize;
         this.value = 0;
         this.grow = true;
+    }
+}
+
+class block
+{
+    constructor(position,color, fixed){
+        this.position = position;
+        this.velocity = new Vector2(0,0);
+        this.color = color;
+        this.fixed = fixed;
+    }
+
+    move()
+    {
+        this.position.x += this.velocity.x*speed;
+        this.position.y += this.velocity.y*speed;
     }
 }
 
@@ -47,6 +64,14 @@ var speed =3;
 
 var players = [];
 var pulses = [];
+var blocks = [];
+
+var weight;
+
+
+
+var playersize =20;
+var blocksize = 80;
 
 var init = function()
 {
@@ -54,9 +79,56 @@ var init = function()
 
      airconsole.onMessage = function(device, data)
      {
-         //console.log(device);
+
+
+        //console.log("Message Recieved");
+
+        if(data.type == "Movement")
+        {
+
+           // console.log("Message Type: Movement");
+            var p;
+            for(var i = 0; i < players.length; i++)
+            {   
+                if(players[i] != null){
+
+                   
+                    if(players[i].device_id == device)
+                    {
+                      p = players[i];
+                      break;
+                    }
+                }
+                
+            }
+            if(p!=null)
+            {
+
+               //console.log(data.vector);
+                var tempx = data.vector.x;
+                var tempy = data.vector.y;
+
+              // p.velocity.x += data.vector.x;
+              //  p.velocity.y += data.vector.y;
+
+                //console.log(p.velocity);
+                p.movements[data.direction].x = tempx;
+                p.movements[data.direction].y = tempy;
+              
+                
+            
+                
+
+
+
+            }
 
         }
+        
+        
+        //console.log(data);
+
+    }
 
     airconsole.onConnect = function(device_id){
  
@@ -64,7 +136,15 @@ var init = function()
 
         spawnPlayer(device_id);
 
-        var col = players[players.length-1].color;
+
+        var p = players[players.length-1];
+        var col = p.color;
+        p.movements[0] = new Vector2(0,0);
+        p.movements[1] = new Vector2(0,0);
+        p.movements[2] = new Vector2(0,0);
+        p.movements[3] = new Vector2(0,0);
+
+       
 
        //console.log(players[players.length-1]);
 
@@ -83,7 +163,8 @@ var init = function()
         for(var i = 0; i < players.length; i++)
         {
             if(players[i]!=null){
-                if(device_id = players[i].device_id){
+
+                if(device_id == players[i].device_id){
 
                     spawnPulse(players[i].position);
                     players[i] = null;
@@ -108,6 +189,9 @@ function setup()
     //log(airconsole);
 
    // playerTest = new player(new Vector2(300,300), new Vector2(0,0),randColor)
+
+   blocks.push(new block(new Vector2(300,300),"red",false));
+   blocks.push(new block(new Vector2(600,600),"green",false));
    
 }
 
@@ -119,18 +203,278 @@ function draw()
 {
     background(200);
 
-    keyboardControls();
+    //keyboardControls();
 
   
+    updateVelocities();
     movePlayers();
+    moveBlocks();
     drawPlayers();
+    drawBlocks();
     drawPulses();
+
+    var numPlayers = 0;
+    for(var i =0; i < players.length;i++)
+    {
+        if(players[i]!=null){
+            numPlayers++;
+        }
+    }
+
+    weight = round((numPlayers*1.25)/blocks.length);
+    console.log(weight);
 
 };
 
+
+var drawBlocks = function()
+{
+    
+    
+   
+    for(var i = 0; i < blocks.length; i++)
+    {
+        var b = blocks[i];
+
+        if(b!=null)
+        {
+
+            stroke(0);
+            fill(b.color);
+            rect(b.position.x, b.position.y,blocksize,blocksize);
+
+            fill(0);
+            noStroke();
+            textSize(32);
+            //textAlign(CENTRE,CENTRE);
+            text(weight, b.position.x+blocksize/2, b.position.y+blocksize/2);
+        }
+
+    }
+    
+
+}
+
+var updateVelocities = function()
+{
+
+    for(var i = 0; i < players.length; i++)
+    {
+
+        var vel = new Vector2(0,0);
+
+        if(players[i]!=null)
+        {
+
+            
+
+            for(var j = 0; j < players[i].movements.length; j++)
+            {
+                if(players[i]!=null){
+
+                    vel.x += players[i].movements[j].x;
+                    vel.y -= players[i].movements[j].y;
+
+                }
+                
+            }
+
+            //console.log(vel);
+
+            players[i].velocity = vel;
+
+            if(players[i].velocity.x!=0 || players[i].velocity.y!=0)
+                
+                {
+                    //console.log(players[i].velocity);
+                }
+            
+        }
+    }
+}
+
+
+var moveBlocks = function()
+{
+        
+    for(var i =0; i < blocks.length; i++)
+    {
+        if(blocks[i]!=null)
+        {
+
+            noStroke();
+            var warningCol = color(255,0,0,0.5);
+            fill("grey");
+            var b = blocks[i];
+
+            
+          
+            
+
+
+            if((abs(b.velocity.y)+abs(b.velocity.x)+0.5)>weight)
+            {
+                b.move();
+            }
+                
+            
+           
+            b.velocity = new Vector2(0,0);
+
+            if(b.position.x < playersize*1.5){
+                b.position.x = playersize*1.5;
+
+              
+                rect(0,0,playersize*2,height);
+               
+            }
+
+            if(b.position.x > width-blocksize-playersize*1.5)
+            {
+                b.position.x = width-blocksize-playersize*1.5;
+               
+               
+                rect(width-playersize*2,0,playersize*2,height);
+            }
+
+            if(b.position.y < playersize*1.5){
+                b.position.y = playersize*1.5;
+
+                rect(0,0,width,playersize*2);
+                
+            }
+
+            if(b.position.y > height-blocksize-playersize*1.5)
+            {
+                b.position.y = height-blocksize-playersize*1.5;
+                
+            }
+
+            for(var j=0; j<players.length;j++)
+            {
+                if(players[j]!=null){
+
+                    var p = players[j];
+
+                    if(p.position.x > b.position.x-playersize && p.position.x < b.position.x + blocksize){
+    
+                        if(p.position.y > b.position.y-playersize)
+                        {
+                            if(abs((p.position.y -(b.position.y-playersize))<10))
+                            {
+                                p.position.y = b.position.y-playersize;
+                            }
+                            
+                        
+                        }
+    
+    
+                        if(p.position.y < b.position.y+blocksize)
+                        {
+                            
+                                if((((p.position.y - (b.position.y+blocksize))>-10)))
+                                {
+                                p.position.y = b.position.y+blocksize
+                                }
+                        }
+                    }
+    
+                    if(p.position.y > b.position.y-playersize && p.position.y < b.position.y + blocksize){
+    
+                        if(p.position.x > b.position.x-playersize)
+                        {
+                            if(abs((p.position.x -(b.position.x-playersize))<10))
+                            {
+                                p.position.x = b.position.x-playersize;
+                            }
+                            
+                        
+                        }
+    
+    
+                        if(p.position.x < b.position.x+blocksize)
+                        {
+                            
+                                if((((p.position.x - (b.position.x+blocksize))>-10)))
+                                {
+                                p.position.x = b.position.x+blocksize
+                                }
+                        }
+                    }
+                }
+                
+            }
+
+            for(var k=0; k<blocks.length;k++)
+            {
+                if(blocks[k]!=null){
+
+                    var bl = blocks[k];
+
+                    if( bl.position.x > b.position.x-playersize &&  bl.position.x < b.position.x + blocksize){
+    
+                        if( bl.position.y > b.position.y-playersize)
+                        {
+                            if(abs(( bl.position.y -(b.position.y-blocksize))<10))
+                            {
+                                bl.position.y = b.position.y-blocksize;
+                            }
+                            
+                        
+                        }
+    
+    
+                        if(bl.position.y < b.position.y+blocksize)
+                        {
+                            
+                                if((((bl.position.y - (b.position.y+blocksize))>-10)))
+                                {
+                                 bl.position.y = b.position.y+blocksize
+                                }
+                        }
+                    }
+    
+                    if(bl.position.y > b.position.y-blocksize && bl.position.y < b.position.y + blocksize){
+    
+                        if(bl.position.x > b.position.x-blocksize)
+                        {
+                            if(abs((bl.position.x -(b.position.x-blocksize))<10))
+                            {
+                                bl.position.x = b.position.x-blocksize;
+                            }
+                            
+                        
+                        }
+    
+    
+                        if(bl.position.x < b.position.x+blocksize)
+                        {
+                            
+                                if((((bl.position.x - (b.position.x+blocksize))>-10)))
+                                {
+                                bl.position.x = b.position.x+blocksize
+                                }
+                        }
+                    }
+                }
+            }
+
+
+
+
+        }
+
+
+
+
+
+
+    }
+}   
+
 var spawnPulse = function(position){
 
-    pulses.push(new pulse(new Vector2(position.x+10,position.y+10),20,80));
+    pulses.push(new pulse(new Vector2(position.x+10,position.y+10),playersize,80));
 }
 var drawPulses = function()
 {
@@ -162,25 +506,171 @@ var drawPulses = function()
 
 var drawPlayers= function(){
 
+
+    strokeWeight(2);
+    stroke(0);
     for(var i = 0; i < players.length; i++){
 
         if(players[i] != null){
 
             var p = players[i];
             fill(p.color);
-            rect(p.position.x,p.position.y,20,20);
+            rect(p.position.x,p.position.y,playersize,playersize);
         }
     
     }
 
 }
-var movePlayers= function()
+
+var movePlayers = function()
 {
     for(var i = 0; i < players.length; i++){
 
         if(players[i]!=null){
             var p = players[i];
             p.move();
+
+            if(p.position.x < 0){
+                p.position.x = 0;
+            }
+            if(p.position.x > width-playersize){
+                p.position.x = width-playersize;
+            }
+
+
+            if(p.position.y < 0){
+                p.position.y = 0;
+            }
+            if(p.position.y > height-0){
+                p.position.y = height-0;
+            }
+
+
+            
+             for(var j = 0; j < blocks.length; j++)
+             {
+                    var b = blocks[j];
+
+                    if(b!=null)
+                    {
+                        if(b.fixed==true)
+                        {
+
+                            if(p.position.x > b.position.x-playersize && p.position.x < b.position.x + blocksize){
+    
+                                if(p.position.y > b.position.y-playersize)
+                                {
+                                    if(abs((p.position.y -(b.position.y-playersize))<10))
+                                    {
+                                        p.position.y = b.position.y-playersize;
+                                    }
+                                    
+                                
+                                }
+
+
+                                if(p.position.y < b.position.y+blocksize)
+                                {
+                                    
+                                        if((((p.position.y - (b.position.y+blocksize))>-10)))
+                                        {
+                                        p.position.y = b.position.y+blocksize
+                                        }
+                                }
+                            }
+
+                            if(p.position.y > b.position.y-playersize && p.position.y < b.position.y + blocksize){
+    
+                                if(p.position.x > b.position.x-playersize)
+                                {
+                                    if(abs((p.position.x -(b.position.x-playersize))<10))
+                                    {
+                                        p.position.x = b.position.x-playersize;
+                                    }
+                                    
+                                
+                                }
+
+
+                                if(p.position.x < b.position.x+blocksize)
+                                {
+                                    
+                                        if((((p.position.x - (b.position.x+blocksize))>-10)))
+                                        {
+                                        p.position.x = b.position.x+blocksize
+                                        }
+                                }
+                            }
+
+         
+                            
+                        } 
+                        else
+                        {
+
+                            if(p.position.x > b.position.x-playersize && p.position.x < b.position.x + blocksize){
+    
+                                if(p.position.y > b.position.y-playersize)
+                                {
+                                    if(abs((p.position.y -(b.position.y-playersize))<10))
+                                    {
+                                        b.velocity.y += (p.velocity.y*speed)/3;
+                                        p.position.y -= p.velocity.y*speed;
+                                    }
+                                    
+                                
+                                }
+
+
+                                if(p.position.y < b.position.y+blocksize)
+                                {
+                                     if(abs((p.position.y -(b.position.y))>-10))
+                                     {
+                                        b.velocity.y += (p.velocity.y*speed)/3;
+                                        p.position.y -= p.velocity.y*speed;
+                                     }
+                                     
+                                }
+                            }
+
+                            if(p.position.y > b.position.y-playersize && p.position.y < b.position.y + blocksize){
+    
+                                if(p.position.x > b.position.x-playersize)
+                                {
+                                    if(abs((p.position.x -(b.position.x-playersize))<10))
+                                    {
+                                        b.velocity.x += (p.velocity.x*speed)/3;
+                                        p.position.x -= p.velocity.x*speed;
+                                    }
+                                    
+                                
+                                }
+
+
+                                if(p.position.x < b.position.x+blocksize)
+                                {
+                                     if(abs((p.position.x -(b.position.x))>-10))
+                                     {
+                                        b.velocity.x += (p.velocity.x*speed)/3;
+                                        p.position.x -= p.velocity.x*speed;
+                                     }
+                                     
+                                }
+                            }
+
+                            //b.position.x += p.velocity.x/2;
+
+                          
+                           // p.position.x -= p.velocity.y/2;
+                           
+                            
+
+                        }
+                    }
+                } 
+
+        
+
         }
       
         //console.log(p.velocity);
@@ -195,8 +685,33 @@ var spawnPlayer = function(device_ID){
     var b = round(random(125, 255));
 
     var randColor = color(r,g,b);
-    var randPos = new Vector2(round(random(100,700)),round(random(100,700)));
-    players.push(new player(device_ID,randPos, new Vector2(0,0),randColor));
+
+    var test = false;
+
+    var randPos;
+
+    while(test == false){
+
+        randPos = new Vector2(round(random(100,700)),round(random(100,700)));
+      //  spawnPulse(randPos);
+
+        for(var i = 0; i < blocks.length;i++)
+        {
+            if(distance(randPos,blocks[i].position)>blocksize*1.5){
+
+                test = true;
+
+            }else{
+
+                test = false;
+                break;
+            }
+        }
+
+    }
+   
+
+    players.push(new player(device_ID,randPos,randColor));
     spawnPulse(randPos);
 
 }
@@ -228,6 +743,14 @@ var keyboardControls= function(){
     
     
 };
+
+
+var distance = function(v1,v2)
+{
+    var xDis = v2.x - v1.x;
+    var yDis = v2.y - v1.y;
+    return sqrt(xDis*xDis + yDis*yDis);
+}
 
 window.onload = init;
 
