@@ -6,6 +6,20 @@ class Vector2{
     }
 }
 
+
+var blue_img;
+var green_img;
+var red_img;
+var yellow_img;
+function preload() {
+
+     blue_img = loadImage("../assets/sq_blue.png");
+ green_img = loadImage("../assets/sq_green.png");
+ red_img = loadImage("../assets/sq_red.png");
+     yellow_img = loadImage("../assets/sq_yellow.png");
+
+}
+
 function setup()
 {
     var canvas = createCanvas(windowHeight/2.5, windowHeight/2.5);
@@ -26,27 +40,34 @@ function draw()
     rect(0,0,width,height);
 
     fill("red");
-    rect(0,0,width/2,height/2);
+    //rect(0,0,width/2,height/2);
+    image(red_img,0,0,width/2,height/2);
 
     fill("yellow");
-    rect(width/2,0,width/2,height/2);
+    //rect(width/2,0,width/2,height/2);
+    image(yellow_img,width/2,0,width/2,height/2);
 
     fill("blue");
-    rect(0,height/2,width/2,height/2);
+    //rect(0,height/2,width/2,height/2);
+    image(blue_img,0,height/2,width/2,height/2);
+
 
     fill("green");
-    rect(width/2,height/2,width/2,height/2);
+   // rect(width/2,height/2,width/2,height/2);
+   image(green_img,width/2,height/2,width/2,height/2);
 
-    noFill();
-     stroke(0);
-    strokeWeight(5);
-    rect(0,0,width,height);
 
-    fill("Black");
-    noStroke();
-    textSize(50);
-    textAlign(0, 0);
-    text("REPAIR",width/8,(height/2)+25);
+     noFill();
+      stroke(0);
+     strokeWeight(15);
+     
+     rect(0,0,width,height);
+
+    // fill("Black");
+    // noStroke();
+   // textSize(50);
+    //textAlign(0, 0);
+    //text("REPAIR",width/8,(height/2)+25);
 
 
 }

@@ -1,5 +1,26 @@
 
 
+
+var blue_img;
+var green_img;
+var red_img;
+var yellow_img;
+var locked_img;
+var unlocked_img;
+
+var shadow_img;
+function preload() {
+
+    blue_img = loadImage("../assets/sq_blue.png");
+    green_img = loadImage("../assets/sq_green.png");
+    red_img = loadImage("../assets/sq_red.png");
+    yellow_img = loadImage("../assets/sq_yellow.png");
+    shadow_img = loadImage("../assets/Shadow.png");
+    locked_img = loadImage("../assets/sq_locked.png");
+    unlocked_img = loadImage("../assets/sq_unlocked.png");
+
+}
+
 class Vector2{
     constructor(x,y)
     {
@@ -44,6 +65,7 @@ class block
         this.velocity = new Vector2(0,0);
         this.color = color;
         this.fixed = fixed;
+        
     }
 
     move()
@@ -69,14 +91,16 @@ var blocks = [];
 
 var weight;
 
-var level = 4;
-var maxLevel = 4;
+var level = 2;
+var maxLevel = 2;
 var reset = true;
 
 
+var numMoveableBlocks = 0;
+
 
 var playersize =20;
-var blocksize = 80;
+var blocksize = 100;
 
 var debug = false;
 
@@ -222,7 +246,26 @@ function setup()
 }
 
 
+var numMoveables = function()
+{
 
+    var temp = 0;
+    for(var j = 0;j< blocks.length; j++)
+    {
+        if(blocks[j]!=null)
+        {
+           
+            if(blocks[j].fixed==false)
+            {
+
+                temp++;
+
+            }
+        }
+    }
+
+    return temp;
+}
 
     
 function draw() 
@@ -235,20 +278,23 @@ function draw()
   
    
    
-    background(200);
+    background(255);
 
     //keyboardControls();
 
   
+    drawGrid();
     updateVelocities();
     movePlayers();
+   // drawShadows();
+    drawBlocks();
     moveBlocks();
     drawPlayers();
-    drawBlocks();
     drawPulses();
 
     var numPlayers = 0;
-    var numMoveableBlocks = 0;
+    
+
     for(var i =0; i < players.length;i++)
     {
         if(players[i]!=null){
@@ -256,19 +302,12 @@ function draw()
         }
     }
 
-    for(var j = 0;j< blocks.length; j++)
-    {
-        if(blocks[i]!=null)
-        {
-            if(blocks[i].fixed==true)
-            {
-              
-                numMoveableBlocks++;
-            }
-        }
-    }
+   // console.log(numMoveables());
 
-    weight = 1;//round((numPlayers*1.25)/numMoveableBlocks);
+  
+    weight = round(numPlayers/numMoveables());
+
+
     //console.log(weight);
 
 
@@ -284,7 +323,7 @@ function draw()
             blocks.push(new block(0,new Vector2(50,400),"red",false));
             blocks.push(new block(1,new Vector2(650,400),"yellow",false));
             
-            console.log("Level one set");
+            //g("Level one set");
         }
 
         if(level==2){
@@ -293,7 +332,7 @@ function draw()
             blocks.push(new block(1,new Vector2(650,400),"yellow",false));
             blocks.push(new block(100,new Vector2(350,400),"grey",true));
             
-            console.log("Level two set");
+            //console.log("Level two set");
         }
 
         if(level == 3){
@@ -305,19 +344,95 @@ function draw()
         if(level == 4)
         {
 
-            blocks.push(new block(0,new Vector2(250,500),"red",false));
+            blocks.push(new block(0,new Vector2(300,500),"red",false));
 
-            blocks.push(new block(100,new Vector2(250-blocksize,500),"grey",true));
-            blocks.push(new block(101,new Vector2(250,500+blocksize),"grey",true));
-            blocks.push(new block(102,new Vector2(250,500-blocksize),"grey",true));
+            blocks.push(new block(100,new Vector2(300-blocksize,500),"grey",true));
+            blocks.push(new block(101,new Vector2(300,500+blocksize),"grey",true));
+            blocks.push(new block(102,new Vector2(300,500-blocksize),"grey",true));
 
 
             blocks.push(new block(1,new Vector2(300,90),"yellow",false));
             blocks.push(new block(3,new Vector2(100,700),"green",false));
-            
-
           
         }
+
+
+        if(level == 5)
+        {
+            blocks.push(new block(0,new Vector2(50,50),"red",false));
+
+            blocks.push(new block(1,new Vector2(700,50),"yellow",false));
+
+            blocks.push(new block(2,new Vector2(50,700),"blue",false));
+
+            blocks.push(new block(3,new Vector2(700,700),"green",false));
+        }
+
+
+        if(level == 6)
+        {
+            blocks.push(new block(0,new Vector2(500,700),"red",false));
+            blocks.push(new block(1,new Vector2(650,400),"yellow",false));
+            
+
+            blocks.push(new block(200,new Vector2(300,300),"lightgrey",false));
+            blocks.push(new block(3,new Vector2(300-blocksize,300),"green",false));
+            blocks.push(new block(201,new Vector2(300-2*blocksize,300),"lightgrey",false));
+            blocks.push(new block(202,new Vector2(300-blocksize,300+blocksize),"lightgrey",false));
+            blocks.push(new block(203,new Vector2(300-blocksize,300-blocksize),"lightgrey",false));
+        }
+
+        if(level ==7)
+        {
+
+            blocks.push(new block(0,new Vector2(50,50),"red",false));
+
+            blocks.push(new block(1,new Vector2(700,50),"yellow",false));
+
+            blocks.push(new block(2,new Vector2(50,700),"blue",false));
+
+            blocks.push(new block(3,new Vector2(700,700),"green",false));
+
+
+            blocks.push(new block(200, new Vector2(playersize*1.5,400),"lightgrey",false));
+
+            for(var i = 100; i<600;i+=blocksize)
+            {
+                blocks.push(new block(200+i, new Vector2(playersize*1.5+i,400),"grey",true));
+            }
+
+            blocks.push(new block(200, new Vector2(600+playersize*1.5,400),"lightgrey",false));
+
+        
+
+        }
+
+        if(level == 8)
+        {
+
+
+             blocks.push(new block(0,new Vector2(200,200),"red",false));
+
+             blocks.push(new block(1,new Vector2(200,300),"yellow",false));
+
+             blocks.push(new block(2,new Vector2(700,100),"blue",false));
+
+             blocks.push(new block(3,new Vector2(550,500),"green",false));
+
+            for(var i = 50; i<=500;i+=blocksize)
+            {                
+
+                blocks.push(new block(200+i, new Vector2(100,i),"grey",true));
+                //blocks.push(new block(200+i, new Vector2(300,i),"grey",true));
+            }
+
+        }
+        
+
+
+
+
+        
 
         //sendPuzzleColors();
 
@@ -334,6 +449,23 @@ function draw()
 
 };
 
+
+var drawShadows = function()
+{
+
+    for(var i =0; i < blocks.length; i++)
+    {
+        var b = blocks[i];
+        if(b!=null)
+        {
+           // tint(255, 255*(0.3));
+            image(shadow_img,b.position.x,b.position.y,blocksize*(1.8),blocksize*(1.8));
+        }
+
+       
+    }
+    tint(255, 255);
+}
 
 var sendPuzzleColors =function() 
 {
@@ -377,12 +509,14 @@ var checkRepair = function()
 
 
     if(debug==true){
+    
         noFill();
         strokeWeight(2);
         stroke(50);
         rect(targetPositions[1].x, targetPositions[1].y,blocksize,blocksize);
         rect(targetPositions[2].x, targetPositions[2].y,blocksize,blocksize);
         rect(targetPositions[3].x, targetPositions[3].y,blocksize,blocksize);
+
     }
 
 
@@ -416,7 +550,7 @@ var checkRepair = function()
         
     } 
 
-    console.log("Complete: "+complete);
+    //console.log("Complete: "+complete);
 
     if(complete){
         level ++;
@@ -427,11 +561,18 @@ var checkRepair = function()
     }
 
 
+}
 
- 
+var drawGrid= function(){
     
-
-
+    for (var x = 0; x < width; x += width /20 ){
+		for (var y = 0; y < height; y += height /(20)) {
+			stroke(230);
+			strokeWeight(2);
+			line(x+40, 0, x+40, height);
+			line(0, y+40, width, y+40);
+		}
+	}
 }
 
 var drawBlocks = function()
@@ -450,17 +591,56 @@ var drawBlocks = function()
 
             strokeWeight(2);
             stroke(0);
-            fill(b.color);
-            rect(b.position.x, b.position.y,blocksize,blocksize);
+           
+             var img = null;
+            if(b.color == "red"){
+
+                img = red_img;
+            }
+            if(b.color =="yellow")
+            {
+                img = yellow_img;
+            }
+            if(b.color == "green")
+            {
+                img = green_img;
+            }
+            if(b.color =="blue")
+            {
+                img = blue_img;
+                
+            }
+            if(b.color=="grey")
+            {
+                img = locked_img;
+            }
+            if(b.color=="lightgrey"){
+                img = unlocked_img;
+            }
+
+            if(img == null){
+                fill(b.color);
+                rect(b.position.x, b.position.y,blocksize,blocksize);
+            }else{
+                image(img,b.position.x,b.position.y,blocksize,blocksize);
+            }
+
+            
 
             fill(0);
             noStroke();
             textSize(32);
-            textAlign(0,0);
+            //textAlign(0,0);
+
+
 
             if(!b.fixed)
             {
-                text(weight, b.position.x+blocksize/2, b.position.y+blocksize/2);
+
+                var txt = (weight-abs(b.velocity.x)-abs(b.velocity.y));
+                //console.log(txt);
+
+                text(txt, b.position.x+blocksize/2, b.position.y+blocksize/2);
             }
            
         }
@@ -789,7 +969,9 @@ var drawPlayers= function(){
 
             var p = players[i];
             fill(p.color);
-            rect(p.position.x,p.position.y,playersize,playersize);
+            strokeWeight(3);
+            stroke(20);
+            rect(p.position.x,p.position.y,playersize,playersize,4);
         }
     
     }
