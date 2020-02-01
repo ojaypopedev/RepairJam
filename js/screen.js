@@ -38,7 +38,8 @@ class pulse{
 
 class block
 {
-    constructor(position,color, fixed){
+    constructor(ID,position,color, fixed){
+        this.ID = ID;
         this.position = position;
         this.velocity = new Vector2(0,0);
         this.color = color;
@@ -68,10 +69,16 @@ var blocks = [];
 
 var weight;
 
+var level = 4;
+var maxLevel = 4;
+var reset = true;
+
 
 
 var playersize =20;
 var blocksize = 80;
+
+var debug = false;
 
 var init = function()
 {
@@ -152,6 +159,7 @@ var init = function()
 
         spawnPlayer(device_id);
 
+        sendPuzzleColors();
 
         var p = players[players.length-1];
         var col = p.color;
@@ -206,11 +214,11 @@ function setup()
 
    // playerTest = new player(new Vector2(300,300), new Vector2(0,0),randColor)
 
-   blocks.push(new block(new Vector2(300,300),"red",false));
-   blocks.push(new block(new Vector2(600,200),"green",false));
-   blocks.push(new block(new Vector2(200,700),"yellow",false));
-   blocks.push(new block(new Vector2(450,600),"blue",false));
-   blocks.push(new block(new Vector2(500,500),"grey",true));
+   blocks.push(new block(0,new Vector2(300,300),"red",false));
+   blocks.push(new block(1,new Vector2(600,200),"green",false));
+   blocks.push(new block(2,new Vector2(200,700),"yellow",false));
+   blocks.push(new block(3,new Vector2(450,600),"blue",false));
+   blocks.push(new block(4,new Vector2(500,500),"grey",true));
 }
 
 
@@ -219,6 +227,14 @@ function setup()
     
 function draw() 
 {
+   
+
+
+  textSize(canvas.width);
+  text(level, 0, 0);
+  
+   
+   
     background(200);
 
     //keyboardControls();
@@ -246,6 +262,7 @@ function draw()
         {
             if(blocks[i].fixed==true)
             {
+              
                 numMoveableBlocks++;
             }
         }
@@ -254,8 +271,168 @@ function draw()
     weight = 1;//round((numPlayers*1.25)/numMoveableBlocks);
     //console.log(weight);
 
+
+    // 0 1 // R Y //
+    // 2 3 // B G //
+     
+    if(reset==true){
+        reset = false;
+        blocks=[];
+
+        if(level==1){
+
+            blocks.push(new block(0,new Vector2(50,400),"red",false));
+            blocks.push(new block(1,new Vector2(650,400),"yellow",false));
+            
+            console.log("Level one set");
+        }
+
+        if(level==2){
+
+            blocks.push(new block(0,new Vector2(50,400),"red",false));
+            blocks.push(new block(1,new Vector2(650,400),"yellow",false));
+            blocks.push(new block(100,new Vector2(350,400),"grey",true));
+            
+            console.log("Level two set");
+        }
+
+        if(level == 3){
+            blocks.push(new block(0,new Vector2(100,100),"red",false));
+            blocks.push(new block(1,new Vector2(600,600),"yellow",false));
+            blocks.push(new block(2, new Vector2(300,300),"blue",false));
+        }
+
+        if(level == 4)
+        {
+
+            blocks.push(new block(0,new Vector2(250,500),"red",false));
+
+            blocks.push(new block(100,new Vector2(250-blocksize,500),"grey",true));
+            blocks.push(new block(101,new Vector2(250,500+blocksize),"grey",true));
+            blocks.push(new block(102,new Vector2(250,500-blocksize),"grey",true));
+
+
+            blocks.push(new block(1,new Vector2(300,90),"yellow",false));
+            blocks.push(new block(3,new Vector2(100,700),"green",false));
+            
+
+          
+        }
+
+        //sendPuzzleColors();
+
+    }
+
+
+    checkRepair();
+
+
+   
+
+    
+   
+
 };
 
+
+var sendPuzzleColors =function() 
+{
+   
+
+   
+}
+
+var checkRepair = function()
+{
+
+    var targetPositions = [];
+    targetPositions[0] = new Vector2(0,0);
+    targetPositions[1] = new Vector2(0,0);
+    targetPositions[2] = new Vector2(0,0);
+    targetPositions[3] = new Vector2(0,0);
+
+    if(blocks.length>0)
+    {
+        for(var i = 0; i <blocks.length;i++)
+        {
+            if(blocks[i]!=null){
+                if(blocks[i].ID==0){
+                    targetPositions[0] =blocks[i].position;
+                }
+            }
+        }
+        
+    }
+   
+
+    targetPositions[1].x = targetPositions[0].x + blocksize;
+    targetPositions[1].y = targetPositions[0].y;
+
+    targetPositions[2].x = targetPositions[0].x;
+    targetPositions[2].y = targetPositions[0].y +blocksize;
+
+    targetPositions[3].x = targetPositions[0].x +blocksize;
+    targetPositions[3].y = targetPositions[0].y +blocksize;
+
+
+
+    if(debug==true){
+        noFill();
+        strokeWeight(2);
+        stroke(50);
+        rect(targetPositions[1].x, targetPositions[1].y,blocksize,blocksize);
+        rect(targetPositions[2].x, targetPositions[2].y,blocksize,blocksize);
+        rect(targetPositions[3].x, targetPositions[3].y,blocksize,blocksize);
+    }
+
+
+    var complete = true;
+
+    for (var j = 0; j<=3 ;j++){
+
+        for(var i = 0; i < blocks.length;i++)
+        {
+        
+            if(blocks[i]!=null)
+            {
+                var b = blocks[i];
+                var identity = j
+                if(b.ID == identity )
+                {
+
+                    if(distance(b.position, targetPositions[identity])<10)
+                    {
+                        //something here
+
+                    }else{
+                        complete = false;
+                        break;
+                    }
+                }
+
+
+            }
+        }
+        
+    } 
+
+    console.log("Complete: "+complete);
+
+    if(complete){
+        level ++;
+        if(level > maxLevel){
+            level = 1;
+        }
+        reset = true;
+    }
+
+
+
+ 
+    
+
+
+}
 
 var drawBlocks = function()
 {
@@ -269,6 +446,9 @@ var drawBlocks = function()
         if(b!=null)
         {
 
+
+
+            strokeWeight(2);
             stroke(0);
             fill(b.color);
             rect(b.position.x, b.position.y,blocksize,blocksize);
@@ -276,7 +456,8 @@ var drawBlocks = function()
             fill(0);
             noStroke();
             textSize(32);
-            //textAlign(CENTRE,CENTRE);
+            textAlign(0,0);
+
             if(!b.fixed)
             {
                 text(weight, b.position.x+blocksize/2, b.position.y+blocksize/2);

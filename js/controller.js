@@ -20,31 +20,39 @@ function draw()
     background(200);
 
     noFill();
-    stroke(0);
-    strokeWeight(5);
+    noStroke();
+  //  stroke(0);
+    //strokeWeight(5);
     rect(0,0,width,height);
 
     fill("red");
     rect(0,0,width/2,height/2);
 
-    fill("blue");
+    fill("yellow");
     rect(width/2,0,width/2,height/2);
 
-    fill("green");
+    fill("blue");
     rect(0,height/2,width/2,height/2);
 
-    fill("yellow");
+    fill("green");
     rect(width/2,height/2,width/2,height/2);
 
-    fill("grey");
+    noFill();
+     stroke(0);
+    strokeWeight(5);
+    rect(0,0,width,height);
+
+    fill("Black");
     noStroke();
     textSize(50);
-    text("Repair",width/8,(height/2)+25);
+    textAlign(0, 0);
+    text("REPAIR",width/8,(height/2)+25);
 
 
 }
 
 
+var colors= [];
 
 
 var airconsole;
@@ -61,20 +69,25 @@ var init = function()
 
     airconsole.onMessage = function(device, data)
     {
-        if(data.type=="Color")
-         {
-            //(data.color_data);
 
-            var a = data.color_data.levels[0];
-            var b = data.color_data.levels[1];
-            var c = data.color_data.levels[2];
+        if(data.type!=null){
+            if(data.type=="Color")
+            {
+               //(data.color_data);
+   
+               var a = data.color_data.levels[0];
+               var b = data.color_data.levels[1];
+               var c = data.color_data.levels[2];
+           
+              // console.log(a+"_"+b+"_"+c);
+   
+               document.body.style.backgroundColor = "rgb("+a+","+b+","+c+")";    
+           }
+   
+   
         
-           // console.log(a+"_"+b+"_"+c);
-
-            document.body.style.backgroundColor = "rgb("+a+","+b+","+c+")";
-                
-               
         }
+       
 
     }
 }
