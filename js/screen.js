@@ -125,6 +125,22 @@ var init = function()
 
         }
         
+        if(data.type =="Pulse")
+        {
+
+            for(var i=0;i < players.length;i++){
+                var p = players[i];
+                if(p!=null)
+                {
+                    if(p.device_id==device){
+                        spawnPulse(p.position);
+                    }
+                }
+            }
+
+        }
+
+        
         
         //console.log(data);
 
@@ -132,7 +148,7 @@ var init = function()
 
     airconsole.onConnect = function(device_id){
  
-        console.log("SOMETHING CONNECTED");
+       // console.log("SOMETHING CONNECTED");
 
         spawnPlayer(device_id);
 
@@ -173,7 +189,7 @@ var init = function()
             }
             
         }
-        console.log("SOMETHING DISCONNECTED");
+        //console.log("SOMETHING DISCONNECTED");
        
     
     }
@@ -191,8 +207,10 @@ function setup()
    // playerTest = new player(new Vector2(300,300), new Vector2(0,0),randColor)
 
    blocks.push(new block(new Vector2(300,300),"red",false));
-   blocks.push(new block(new Vector2(600,600),"green",false));
-   
+   blocks.push(new block(new Vector2(600,200),"green",false));
+   blocks.push(new block(new Vector2(200,700),"yellow",false));
+   blocks.push(new block(new Vector2(450,600),"blue",false));
+   blocks.push(new block(new Vector2(500,500),"grey",true));
 }
 
 
@@ -214,6 +232,7 @@ function draw()
     drawPulses();
 
     var numPlayers = 0;
+    var numMoveableBlocks = 0;
     for(var i =0; i < players.length;i++)
     {
         if(players[i]!=null){
@@ -221,8 +240,19 @@ function draw()
         }
     }
 
-    weight = round((numPlayers*1.25)/blocks.length);
-    console.log(weight);
+    for(var j = 0;j< blocks.length; j++)
+    {
+        if(blocks[i]!=null)
+        {
+            if(blocks[i].fixed==true)
+            {
+                numMoveableBlocks++;
+            }
+        }
+    }
+
+    weight = 1;//round((numPlayers*1.25)/numMoveableBlocks);
+    //console.log(weight);
 
 };
 
@@ -247,7 +277,11 @@ var drawBlocks = function()
             noStroke();
             textSize(32);
             //textAlign(CENTRE,CENTRE);
-            text(weight, b.position.x+blocksize/2, b.position.y+blocksize/2);
+            if(!b.fixed)
+            {
+                text(weight, b.position.x+blocksize/2, b.position.y+blocksize/2);
+            }
+           
         }
 
     }
@@ -409,53 +443,112 @@ var moveBlocks = function()
             {
                 if(blocks[k]!=null){
 
+
+                
+    
+
                     var bl = blocks[k];
 
-                    if( bl.position.x > b.position.x-playersize &&  bl.position.x < b.position.x + blocksize){
+                    if(bl.fixed == false){
+                        if( bl.position.x > b.position.x-playersize &&  bl.position.x < b.position.x + blocksize){
     
-                        if( bl.position.y > b.position.y-playersize)
-                        {
-                            if(abs(( bl.position.y -(b.position.y-blocksize))<10))
+                            if( bl.position.y > b.position.y-playersize)
                             {
-                                bl.position.y = b.position.y-blocksize;
-                            }
-                            
-                        
-                        }
-    
-    
-                        if(bl.position.y < b.position.y+blocksize)
-                        {
-                            
-                                if((((bl.position.y - (b.position.y+blocksize))>-10)))
+                                if(abs(( bl.position.y -(b.position.y-blocksize))<10))
                                 {
-                                 bl.position.y = b.position.y+blocksize
+                                    bl.position.y = b.position.y-blocksize;
                                 }
+                                
+                            
+                            }
+        
+        
+                            if(bl.position.y < b.position.y+blocksize)
+                            {
+                                
+                                    if((((bl.position.y - (b.position.y+blocksize))>-10)))
+                                    {
+                                     bl.position.y = b.position.y+blocksize
+                                    }
+                            }
+                        }
+        
+                        if(bl.position.y > b.position.y-blocksize && bl.position.y < b.position.y + blocksize){
+        
+                            if(bl.position.x > b.position.x-blocksize)
+                            {
+                                if(abs((bl.position.x -(b.position.x-blocksize))<10))
+                                {
+                                    bl.position.x = b.position.x-blocksize;
+                                }
+                                
+                            
+                            }
+        
+        
+                            if(bl.position.x < b.position.x+blocksize)
+                            {
+                                
+                                    if((((bl.position.x - (b.position.x+blocksize))>-10)))
+                                    {
+                                    bl.position.x = b.position.x+blocksize
+                                    }
+                            }
                         }
                     }
+
+                    else
+                    {
+                        if(b.position.x > bl.position.x-blocksize && b.position.x < bl.position.x + blocksize){
     
-                    if(bl.position.y > b.position.y-blocksize && bl.position.y < b.position.y + blocksize){
-    
-                        if(bl.position.x > b.position.x-blocksize)
-                        {
-                            if(abs((bl.position.x -(b.position.x-blocksize))<10))
+                            if(b.position.y > bl.position.y-blocksize)
                             {
-                                bl.position.x = b.position.x-blocksize;
-                            }
-                            
-                        
-                        }
-    
-    
-                        if(bl.position.x < b.position.x+blocksize)
-                        {
-                            
-                                if((((bl.position.x - (b.position.x+blocksize))>-10)))
+                                if(abs((b.position.y -(bl.position.y-blocksize))<10))
                                 {
-                                bl.position.x = b.position.x+blocksize
+                                    b.position.y = bl.position.y-blocksize;
                                 }
+                                
+                            
+                            }
+
+
+                            if(b.position.y < bl.position.y+blocksize)
+                            {
+                                
+                                    if((((b.position.y - (bl.position.y+blocksize))>-10)))
+                                    {
+                                     b.position.y = bl.position.y+blocksize
+                                    }
+                            }
                         }
+
+                        if(b.position.y > bl.position.y-blocksize && b.position.y < bl.position.y + blocksize){
+
+                            if(b.position.x > bl.position.x-blocksize)
+                            {
+                                if(abs((b.position.x -(bl.position.x-blocksize))<10))
+                                {
+                                    b.position.x = bl.position.x-blocksize;
+                                }
+                                
+                            
+                            }
+
+
+                            if(b.position.x < bl.position.x+blocksize)
+                            {
+                                
+                                    if((((b.position.x - (bl.position.x+blocksize))>-10)))
+                                    {
+                                    b.position.x = bl.position.x+blocksize
+                                    }
+                            }
+                        }
+
                     }
+
+
+                    
                 }
             }
 

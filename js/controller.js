@@ -6,6 +6,47 @@ class Vector2{
     }
 }
 
+function setup()
+{
+    var canvas = createCanvas(windowHeight/2.5, windowHeight/2.5);
+    canvas.parent('sketch-holder');
+
+    var x = (windowWidth - width) / 2;
+    canvas.position(x,10);
+}
+
+function draw() 
+{
+    background(200);
+
+    noFill();
+    stroke(0);
+    strokeWeight(5);
+    rect(0,0,width,height);
+
+    fill("red");
+    rect(0,0,width/2,height/2);
+
+    fill("blue");
+    rect(width/2,0,width/2,height/2);
+
+    fill("green");
+    rect(0,height/2,width/2,height/2);
+
+    fill("yellow");
+    rect(width/2,height/2,width/2,height/2);
+
+    fill("grey");
+    noStroke();
+    textSize(50);
+    text("Repair",width/8,(height/2)+25);
+
+
+}
+
+
+
+
 var airconsole;
 //up = 0
 //down =1
@@ -14,7 +55,7 @@ var airconsole;
 
 var init = function()
 {
-    console.log("Controller INIT");
+   // console.log("Controller INIT");
     airconsole = new AirConsole();
 
 
@@ -22,7 +63,7 @@ var init = function()
     {
         if(data.type=="Color")
          {
-            console.log(data.color_data);
+            //(data.color_data);
 
             var a = data.color_data.levels[0];
             var b = data.color_data.levels[1];
@@ -31,13 +72,26 @@ var init = function()
            // console.log(a+"_"+b+"_"+c);
 
             document.body.style.backgroundColor = "rgb("+a+","+b+","+c+")";
-            
-           
                 
                
         }
 
     }
+}
+
+
+
+
+function pulse()
+{
+    airconsole.message(AirConsole.SCREEN,
+        {
+            
+            type : "Pulse"
+           
+            
+        }
+    ) 
 }
 
 

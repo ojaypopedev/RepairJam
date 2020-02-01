@@ -31,6 +31,25 @@
     height: 50%;
 }
 
+#sketch-holder
+{
+    height: auto;
+    
+
+}
+
+#middle_button
+{
+   width: 50%;
+   height: 50%;
+   border-radius: 30%;
+   margin-left: auto;
+    margin-right: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+
     
     
     
@@ -52,7 +71,7 @@
 
 
         <div class="top"> 
-
+            <div id="sketch-holder"></div>
         </div>
         <div class="grid">
 
@@ -61,7 +80,7 @@
             <div></div>
 
             <button class="dir_button" ontouchstart="startmove(2)" ontouchend="endmove(2)" onmousedown="startmove(2)" onmouseup="endmove(2)"></button>
-            <div></div>
+            <button class="dir_buttin" id="middle_button" ontouchstart="pulse()" onmousedown="pulse()">Lost?</button>
             <button class="dir_button"ontouchstart="startmove(3)" ontouchend="endmove(3)" onmousedown="startmove(3)" onmouseup="endmove(3)"></button>
 
             <div></div>
