@@ -1,0 +1,74 @@
+<head>
+    <link rel="stylesheet",href="assets/stylesheet.css">
+
+    <style>
+    body
+{
+    background-color: aqua;
+}
+
+.dir_button {
+    background-color: white;
+    color: black;
+    border: 2px solid #555555;
+}
+  
+.dir_button:hover {
+    background-color: #555555;
+    color: white;
+}
+
+.grid
+{
+    display: grid;
+    grid-template-columns: auto auto auto;
+    height: 50%;
+   
+}
+.top
+{
+    height: 50%;
+}
+
+    
+    
+    
+    </style>
+</head>
+
+<body>
+
+   <!--
+<button ontouchstart="startmove(0)" ontouchend="endmove(0)" onmousedown="startmove(0)" onmouseup="endmove(0)">UP</button>
+   --> 
+    <script type="text/javascript" src="js/p5.js"></script>
+    <script type="text/javascript" src="js/controller.js"></script>
+    <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.7.0.js"></script>
+
+
+    <div>
+
+
+        <div class="top"> 
+
+        </div>
+        <div class="grid">
+
+            <div></div>
+            <button class="dir_button" ontouchstart="startmove(0)" ontouchend="endmove(0)" onmousedown="startmove(0)" onmouseup="endmove(0)"></button>
+            <div></div>
+
+            <button class="dir_button" ontouchstart="startmove(0)" ontouchend="endmove(0)" onmousedown="startmove(0)" onmouseup="endmove(0)"></button>
+            <div></div>
+            <button class="dir_button"ontouchstart="startmove(0)" ontouchend="endmove(0)" onmousedown="startmove(0)" onmouseup="endmove(0)"></button>
+
+            <div></div>
+            <button class="dir_button"ontouchstart="startmove(0)" ontouchend="endmove(0)" onmousedown="startmove(0)" onmouseup="endmove(0)"></button>
+            <div></div>
+            
+        </div>
+       
+
+    </div>
+
+</body>
